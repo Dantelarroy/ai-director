@@ -1,6 +1,23 @@
 {
   "name": "ai-filmmaking",
-  "displayName": "AI Filmmaking",
+  "displayName": "AI Director",
   "shortDescription": "End-to-end AI filmmaking workflow: moodboard to cinematic video with sound.",
-  "category": "creative-production"
+  "category": "creative-production",
+  "owner": {
+    "name": "Dante",
+    "email": "web@elkanodata.com"
+  },
+  "plugins": [
+    {
+      "name": "ai-filmmaking",
+      "displayName": "AI Filmmaking",
+      "description": "End-to-end AI filmmaking skills: from dramatic brief to finished cinematic video with sound. 14 skills covering pre-production, stills, video, audio, and assembly.",
+      "version": "1.0.0",
+      "source": "./",
+      "author": {
+        "name": "Dante",
+        "email": "web@elkanodata.com"
+      }
+    }
+  ]
 }
