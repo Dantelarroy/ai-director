@@ -1,13 +1,13 @@
 ---
 name: brief-to-art-direction
-description: Use when you have a dramatic script, scene description, or narrative intent and need to translate it into a visual production bible before generating anything
+description: Use when you have a dramatic idea, scene, or script — runs a guided Q&A and writes production/art-direction.md before any image is generated
 ---
 
 # Brief to Art Direction
 
 ## Overview
 
-A dramatic brief tells you WHAT happens. Art Direction tells the AI HOW it looks. These are different documents. Skipping the translation between them is the #1 cause of incoherent AI films — each generation makes its own visual decisions because nothing locked them down first.
+A narrative brief is not a visual brief. "A woman waits for news in a hospital" tells you the story. It tells you nothing about the color temperature of the light, the emotional register of the space, or what the film must never look like. This skill runs a structured Q&A to extract the visual DNA from the narrative, then writes the Art Direction Document that every subsequent skill will read.
 
 ## The Iron Law
 
@@ -15,71 +15,92 @@ A dramatic brief tells you WHAT happens. Art Direction tells the AI HOW it looks
 NO PRODUCTION STEP BEGINS BEFORE THE DRAMATIC BRIEF IS FULLY TRANSLATED INTO VISUAL DNA
 ```
 
-## What the Brief Must Answer
+## Active Process
 
-Before writing the Art Direction Document, extract answers to all of these:
+Announce: "Usando `brief-to-art-direction` para construir el documento de dirección de arte."
 
-- What is the emotional register? (psychological drama / dark comedy / documentary / thriller / etc.)
-- What does the space feel like? (institutional / domestic / liminal / oppressive / sacred / etc.)
-- What is the central visual tension? (cold exterior vs warm interior / empty space vs occupied figures / closeness vs distance / etc.)
-- What emotion do characters carry that is NEVER stated aloud?
-- What is the time of day, season, era?
-- What does the camera observe? (does it intrude / observe from distance / stay neutral / etc.)
+**Step 1: Check for existing document**
 
-## The Art Direction Document
+If `production/art-direction.md` exists → read it, show a summary, and ask:
+> "Ya existe un Art Direction Document. ¿Lo retomamos o empezamos de cero?"
 
-Output: a written document with all eight sections. Every section is required.
+If it doesn't exist → proceed to Step 2.
 
-**1. Visual Concept**
-One sentence. The entire film in visual terms.
-Example: "Institutional stillness punctuated by involuntary humanity — two strangers sharing a fluorescent waiting room at 4am."
+**Step 2: Ask 5 questions — one at a time. Wait for each answer before asking the next.**
 
-**2. Emotional Register and Tone**
-Two to three sentences. The emotional world the film inhabits.
-- What tension drives the scene?
-- What is the emotional temperature (cold / warm / ambivalent)?
-- What does the audience feel, not think?
+**Pregunta 1 — Registro emocional:**
+> "¿Cuál es el registro emocional de esta historia? (drama psicológico, comedia oscura, documental, thriller, poético, otro)"
 
-**3. Space Description**
-What the set feels like, not what it contains.
-- Architecture: what type of space is this?
-- History: does it feel used, abandoned, institutional, lived-in?
-- Scale: intimate or oppressive?
-- What the space does to the people in it
+**Pregunta 2 — El espacio:**
+> "¿Cómo se siente el espacio donde transcurre? No qué contiene — cómo se siente. (institucional, doméstico, liminal, opresivo, íntimo, etc.)"
 
-**4. Character Visual Archetypes**
-Not descriptions yet — just the visual type.
-- Character A: e.g., "the exhausted professional — restrained, contained, formal"
-- Character B: e.g., "the heavy presence — stillness as weight, not peace"
+**Pregunta 3 — Tensión visual central:**
+> "¿Cuál es la tensión visual central? Ejemplos: frío exterior vs. calor interior / espacio vacío vs. figuras ocupadas / luz controlada vs. caos"
 
-**5. Lighting Philosophy**
-One dominant contrast that governs all shots.
-- Source 1 (temperature + direction)
-- Source 2 (temperature + direction)
-- The tension between them
-- What casts deep shadows vs what is illuminated
+**Pregunta 4 — Personajes:**
+> "¿Cuántos personajes hay y qué cargan emocionalmente que nunca dicen en voz alta?"
 
-**6. Color Philosophy**
-- Palette family (warm / cold / desaturated / tetradic / etc.)
-- Dominant colors (name them, not hex)
-- Accent color (what stands out and why)
-- What colors are excluded and why
+**Pregunta 5 — Tiempo y época:**
+> "¿Qué hora del día, estación, época? ¿Hay algún elemento temporal que sea dramáticamente importante?"
 
-**7. Atmosphere Tokens**
-Five to seven words that capture the mood. These go directly into prompts.
-Example: "silent waiting, suburban unease, nighttime stillness, unresolved narrative"
+**Step 3: Propose the Visual Concept**
 
-**8. Exclusion List**
-What this film absolutely is NOT. Be specific.
-Example: "No daylight. No saturated colors. No dynamic camera movement. No smiling. No modern design elements. No decorative lighting."
+Synthesize one sentence from the answers. Show it and ask:
+> "Concepto visual propuesto: '[una oración]'. ¿Aprobás o ajustamos?"
 
-## Rationalization Prevention
+Iterate until approved.
 
-| Excuse | Reality |
+**Step 4: Generate and write the full document**
+
+Write all 8 sections, then save to `production/art-direction.md`:
+
+```markdown
+# Art Direction Document
+## [Project name or scene description]
+
+> Output of `ai-filmmaking:brief-to-art-direction`
+
+### 1. Visual Concept
+[One sentence]
+
+### 2. Emotional Register and Tone
+[2-3 sentences]
+
+### 3. Space Description
+[How the space feels — not what it contains]
+
+### 4. Character Visual Archetypes
+[Per character: what they carry physically, what their body shows]
+
+### 5. Lighting Philosophy
+[One dominant contrast]
+
+### 6. Color Philosophy
+[Palette family, accent color, exclusions]
+
+### 7. Atmosphere Tokens
+[7-10 words or short phrases for prompt use]
+
+### 8. Exclusion List — What This Film Is NOT
+[5-7 specific exclusions]
+```
+
+**Step 5: Transition**
+
+> "Art Direction Document guardado en `production/art-direction.md`. Invocando `moodboard-extraction`..."
+
+Invoke `ai-filmmaking:moodboard-extraction`.
+
+## Output
+
+**File:** `production/art-direction.md`
+**Read by:** `moodboard-extraction`, `style-prefix`, `scene-geography`, `character-bible`, `audio-crafting`
+
+## Red Flags
+
+| Thought | Reality |
 |---|---|
-| "The brief is clear enough to start" | A clear narrative brief is not a visual brief. They are different documents. |
-| "I'll figure out the look as I generate" | Visual drift is the #1 cause of incoherent AI films. Fix the look before the first generation. |
-| "The moodboard will define the look" | Moodboard extracts existing looks. Art Direction defines YOUR look. Both are required. |
-| "I'll write this after the first batch" | The first batch becomes the visual anchor. Write before, not after. |
-
-**REQUIRED NEXT SKILL:** ai-filmmaking:moodboard-extraction
+| "The brief is clear enough to start generating" | A clear narrative brief is not a visual brief. They are different documents. |
+| "I'll figure out the look as I generate" | Visual drift is the #1 cause of incoherent AI films. Fix the look first. |
+| "The moodboard will define the look" | Moodboard extracts existing looks. Art Direction defines YOUR look. Both required. |
+| "5 questions is too many" | These 5 answers determine every visual decision that follows. They take 2 minutes. |

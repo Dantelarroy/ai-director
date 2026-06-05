@@ -1,98 +1,108 @@
 ---
 name: moodboard-extraction
-description: Use when you have collected reference images and need to extract reusable visual rules before generating any image — never use reference images directly in prompts
+description: Use when you have reference images to analyze — runs per-image analysis and writes production/visual-tokens.md with the extracted visual rules
 ---
 
 # Moodboard Extraction
 
 ## Overview
 
-Reference images carry unwanted passengers: specific faces, intellectual property, compositional accidents, and contextual meaning that doesn't belong in your film. You cannot upload a moodboard image to a prompt and expect the AI to extract only what you want. You extract the DNA — the transferable rules — and those rules go into prompts, not the images.
+Reference images carry unwanted elements: specific faces, intellectual property, compositional accidents from a different director's film. You never use reference images directly in prompts — you extract the DNA. The rules, not the images. This skill runs a structured analysis of each reference and produces the Visual Token Document that `style-prefix` will read.
 
 ## The Iron Law
 
 ```
-NO IMAGE GENERATION BEFORE THE VISUAL TOKEN DOCUMENT IS WRITTEN — NEVER USE REFERENCE IMAGES DIRECTLY IN PROMPTS
+NO IMAGE GENERATION BEFORE THE VISUAL TOKEN DOCUMENT IS WRITTEN — EXTRACT RULES, NEVER USE REFERENCES DIRECTLY
 ```
 
-## Moodboard Composition (Minimum 9 Images)
+## Active Process
 
-Collect references across these categories — weak coverage produces weak rules:
+Announce: "Usando `moodboard-extraction` para extraer reglas visuales de las referencias."
 
-| Category | Minimum | What to look for |
-|---|---|---|
-| Lighting references | 2 | Direction, temperature, contrast, falloff |
-| Color/palette references | 2 | Dominant tones, accent colors, relationships |
-| Composition/framing references | 2 | Shot size, symmetry, negative space, geometry |
-| Texture/material references | 2 | Surface quality, aging, finish (matte vs gloss) |
-| Atmosphere/mood synthesis | 1 | The feeling of the whole — the image that synthesizes all others |
+**Step 1: Read context**
 
-## Per-Image Analysis (All 6 Categories Required)
+Read `production/art-direction.md`. Use it to frame what you're looking for in the references.
 
-For each image in the moodboard, analyze and document:
+**Step 2: Request images**
 
-**1. Stylistic register and visual language**
-What is the cinematic grammar? (analog / documentary / editorial / thriller / etc.)
-What is the camera's relationship to the subject? (observer / intruder / neutral / intimate)
+> "Compartí las imágenes de referencia. Mínimo 9, idealmente en estas categorías: 2 de iluminación, 2 de paleta/color, 2 de composición/encuadre, 2 de texturas/materiales, 1 de atmósfera general. Podés compartirlas en un solo mensaje o de a una."
 
-**2. Light: direction, intensity, temperature, contrast**
-- Where does the key light come from?
-- What temperature is it? (tungsten warm / fluorescent cold / daylight neutral)
-- How much contrast? (high / medium / low)
-- What does it leave in shadow?
+**Step 3: Analyze each image — 6 categories**
 
-**3. Dominant color palette + accent colors**
-- Name the 2-3 dominant colors
-- Name the 1 accent color (what stands out)
-- Describe the color relationship (complementary / tetradic / monochromatic / etc.)
-
-**4. Materials, textures, surfaces**
-- What surfaces are present? (stucco / ceramic / vinyl / glass / metal / fabric)
-- What is their finish? (matte / semi-gloss / reflective)
-- What do they communicate? (institutional / domestic / aged / pristine)
-
-**5. Composition, framing, scale, visual hierarchy**
-- Shot type (wide / medium / close-up / extreme close-up)
-- Symmetry level (rigid / partial / asymmetric)
-- Where is the subject in the frame?
-- What is the negative space doing?
-
-**6. Emotional atmosphere and repeatable visual resources**
-- What emotion does this image evoke?
-- What specific elements create that emotion and could be reused?
-
-## Cross-Reference Analysis (After All Images)
-
-Answer these three questions by comparing all images:
-
-**What do all images share?** → These are your RULES. Apply them to every prompt.
-
-**What tensions exist between images?** → These are CREATIVE CHOICES to make deliberately.
-
-**What is excluded in all of them?** → These become your EXCLUSION LIST.
-
-## The Visual Token Document (Output)
-
-Write this document. It is the deliverable of this skill. Every section is required.
+For each image, run this analysis out loud:
 
 ```
-STYLE TOKENS:       [3-5 words: e.g., "analog night photography, cinematic psychological drama"]
-LIGHTING TOKENS:    [3-5 words: e.g., "warm tungsten overhead, cold blue exterior, deep shadows"]
-COLOR TOKENS:       [palette names: e.g., "deep navy, near-black brown, burnt amber, dusty pink"]
-MATERIAL TOKENS:    [surfaces: e.g., "textured matte stucco, dark ceramic tile, brown vinyl chairs"]
-COMPOSITION TOKENS: [framing rules: e.g., "frontal rigid portrait, empty chairs as negative space"]
-ATMOSPHERE TOKENS:  [emotional words: e.g., "silent waiting, contained anxiety, nighttime stillness"]
-EXCLUSION RULES:    [what to never generate: e.g., "no daylight, no saturated colors, no smiling"]
-BASE FORMULA:       [one sentence: Space + Light + Figure + Color = Feeling]
+Imagen [N]:
+1. Registro estilístico — ¿Qué tipo de imagen es? ¿Qué lenguaje visual usa?
+2. Luz — dirección, intensidad, temperatura, contraste
+3. Paleta dominante — colores principales + acento + lo que está ausente
+4. Materiales y texturas — superficies, acabados, calidad
+5. Composición — encuadre, escala, jerarquía visual
+6. Atmósfera — qué emoción genera, qué recursos son repetibles
 ```
+
+**Step 4: Cross-reference synthesis**
+
+After all images:
+
+> "Analizando patrones across todas las imágenes..."
+
+Answer three questions:
+- ¿Qué comparten todas? → estas son tus reglas
+- ¿Qué tensiones existen? → estas son decisiones creativas a tomar
+- ¿Qué está excluido en todas? → esta es tu lista de exclusiones
+
+**Step 5: Generate and write Visual Token Document**
+
+Write to `production/visual-tokens.md`:
+
+```markdown
+# Visual Token Document
+## [Project name]
+
+> Output of `ai-filmmaking:moodboard-extraction`
+
+## Style tokens
+[3-5 words]
+
+## Lighting tokens
+[3-5 words: direction, temperature, contrast]
+
+## Color tokens
+[Palette names — not hex codes]
+
+## Material tokens
+[Surfaces and textures]
+
+## Composition tokens
+[Framing rules]
+
+## Atmosphere tokens
+[Emotional words]
+
+## Exclusion rules
+[What to NEVER generate — consolidated]
+
+## Base formula
+[One sentence combining the above — used as prompt seed]
+```
+
+**Step 6: Transition**
+
+> "Visual Token Document guardado en `production/visual-tokens.md`. Invocando `style-prefix`..."
+
+Invoke `ai-filmmaking:style-prefix`.
+
+## Output
+
+**File:** `production/visual-tokens.md`
+**Read by:** `style-prefix`
 
 ## Red Flags
 
 | Thought | Reality |
 |---|---|
-| "I'll upload the moodboard images directly to the prompt" | Direct references pull unwanted specifics: faces, IP, compositional accidents. Extract the rules. |
+| "I'll upload the moodboard images directly to the prompt" | Direct references pull unwanted specifics — specific faces, IP, accidental compositions. Extract the rules. |
 | "9 images is too many" | Fewer references = weaker cross-validation = weaker rules. 9 is the minimum. |
-| "I'll do this mentally, I don't need to write it" | Unwritten rules drift. The token document must be written to be applied consistently. |
-| "The colors speak for themselves" | Color names in prompts drift. Name them explicitly ("deep navy blue", not "dark blue"). |
-
-**REQUIRED NEXT SKILL:** ai-filmmaking:style-prefix
+| "I'll do this mentally, I don't need to write it" | Unwritten rules drift. Tokens must be documented to be applied consistently across all 14 shots. |
+| "I'll analyze them all at once" | Per-image analysis catches what batch review misses. One image at a time. |

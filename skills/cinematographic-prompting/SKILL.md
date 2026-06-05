@@ -1,13 +1,13 @@
 ---
 name: cinematographic-prompting
-description: Use when writing any image or video generation prompt — enforces the 7-field structure that eliminates spatial ambiguity, character drift, and style inconsistency
+description: Use when generating any image — reads all locked production documents and writes a complete 7-field prompt for the requested shot to production/prompts/[shot-id].md
 ---
 
 # Cinematographic Prompting
 
 ## Overview
 
-Natural language prompts produce natural language problems: the model fills in what you didn't specify with its own defaults. In a dramatic scene with two characters, a specific camera angle, a locked geography, and a defined lighting contract — "its own defaults" means everything breaks. The 7-field structure eliminates ambiguity by forcing you to specify every dimension of the image before the model generates it.
+Natural language prompts produce natural language problems: the model fills in what you didn't specify with its own defaults. In a dramatic scene with two characters, a specific camera angle, and a locked geography — "its own defaults" means everything breaks. The 7-field structure eliminates ambiguity by specifying every dimension before the model generates.
 
 ## The Iron Law
 
@@ -15,125 +15,115 @@ Natural language prompts produce natural language problems: the model fills in w
 EVERY PROMPT MUST INCLUDE ALL 7 FIELDS AND THE REFERENCE SYNTAX — INCOMPLETE PROMPTS ARE REFUSED
 ```
 
-## The 7 Fields
+## Active Process
 
-### SUBJECT
-Who is in this shot and what is their locked identity reference.
+Announce: "Usando `cinematographic-prompting` para escribir el prompt completo del plano."
 
-```
-SUBJECT: @character1 (Character A) | @character2 (Character B)
-```
+**Step 1: Read all locked documents**
 
-Use `@ref` syntax — do not describe the character in text when a locked reference exists. `@ref` overrides description. Text description drifts across generations; `@ref` does not.
+Read:
+- `production/style-prefix.md` — the locked prefix (full, verbatim)
+- `production/scene-geography.md` — axis, screen positions, objects, cameras, blocking rule
+- `production/shot-list.md` — all planned shots
+- `production/character-bible/character-*.md` — all character descriptors
 
-### ACCIÓN
-What the character intends or feels — not what they physically do.
+**Step 2: Ask which shot**
 
-```
-ACCIÓN: She is waiting — exhausted, beyond impatience, simply enduring
-```
+> "¿Para qué Shot ID escribimos el prompt? (Ver `production/shot-list.md` para la lista completa)"
 
-- ✅ Emotional intention: "he moves as if being dragged forward by grief"
-- ❌ Mechanical action: "he turns left and walks to the fridge"
+**Step 3: Generate the complete 7-field prompt**
 
-The model interprets emotional intention as performance style, which is more stable than action description. "He is heartbroken" produces better results than "he looks sad and walks slowly."
+Using ALL information from the locked documents, write the complete prompt. Do not ask questions — all information is in the documents. Generate directly.
 
-### ENTORNO
-The set — geography, objects, surfaces.
+**The 7 Fields:**
 
 ```
-ENTORNO: <<<img1>>> — hospital waiting room, terracotta back wall, bench against wall,
-         clock above bench, vending machine right wall warm amber, glass door left cold
-```
+SUBJECT:
+@characterN — [Character name], [screen position per geography].
+[Additional characters if multi-character shot]
+@ref overrides all text description.
 
-- `<<<img1>>>` anchors the scene to the approved key visual
-- Add specific object positions from the geography document
-- This field re-states the geography to prevent model drift
+CRITICAL BLOCKING RULE:
+[Copy verbatim from production/scene-geography.md]
 
-### LENTE/CÁMARA
-The focal length equivalent and camera position.
+ACCIÓN:
+[Emotional intention — not mechanical action]
+[Example: "She is enduring — not performing patience, simply waiting"]
+[Never: "She turns left and walks to the window"]
 
-```
-LENTE/CÁMARA: 50mm equivalent, CAM 1 MASTER position (frontal, wide, both characters visible)
-```
+ENTORNO:
+<<<img1>>> — [location name]
+[All objects with their locked positions from scene-geography.md]
+[Camera name and position from scene-geography.md]
 
-Reference the floor plan camera by name. This anchors the camera position to the geography document rather than leaving it to model interpretation.
+LENTE/CÁMARA:
+[Focal equivalent — derive from camera name in geography]
+[Static or moving — describe the motion as continuous arc if moving]
 
-Common focal equivalents and their effects:
-- 24-28mm: wide, environmental, slight distortion at edges
-- 35mm: naturalistic, documentary feel
-- 50mm: neutral, "what the eye sees"
-- 85mm: slight compression, flattering, portraiture
-- 135mm+: strong compression, subject isolated from background
+LUZ:
+[Temperature and direction per geography document]
+[Reflection contract per geography document — stated explicitly]
 
-### LUZ
-Light direction, temperature, contrast, and reflection contract.
+ESTILO/REF:
+[Style prefix — paste full, verbatim from production/style-prefix.md]
+[Additional atmosphere tokens from art-direction.md]
 
-```
-LUZ: cold blue-green institutional fluorescent from left corridor,
-     warm tungsten amber from right vending machine,
-     low ambient fill, deep shadows, compressed blacks.
-     LEFT glass: cold reflection of corridor light.
-     RIGHT vending glass: warm amber reflection of internal light.
-```
-
-State the reflection contract explicitly if reflective surfaces are in the frame. A reflection that shows the wrong temperature or the wrong content fails the continuity audit.
-
-### ESTILO/REF
-Style prefix tokens + moodboard tokens.
-
-```
-ESTILO/REF: [paste full style prefix here]
-            analog night photography, cinematic psychological drama,
-            textured matte surfaces, soft film grain, 24fps motion
-```
-
-The style prefix goes here verbatim — do not abbreviate it. Every generation needs the full prefix to produce consistent results.
-
-### NEGATIVO
-Exhaustive list of what must not appear.
-
-Structure the NEGATIVO in categories:
-
-```
 NEGATIVO — Character violations:
-  Do not move Character A. Do not move Character B. Do not swap left and right.
-  Do not change wardrobe, age, hairstyle, posture, or emotional tone.
+[Do not move, swap, change wardrobe, age, hair of any character]
+[Do not add characters]
 
 NEGATIVO — Spatial violations:
-  Do not cross the 180-degree axis. Do not redesign the room.
-  Do not move the bench, clock, vending machine, or plastic bag.
+[Do not cross the 180° axis]
+[Do not move any locked objects]
+[Do not redesign the space]
+
+NEGATIVO — Lighting violations:
+[Do not show wrong temperature on wrong side]
+[Do not show wrong reflection temperature]
 
 NEGATIVO — Style violations:
-  No daylight. No bright modern lobby. No saturated colors.
-  No decorative or artificial-looking reflections.
+[All exclusions from style-prefix.md exclusion list]
 
 NEGATIVO — Technical violations:
-  No motion blur. No noise artifacts. No fake depth of field.
-  No visible AI artifacts. No deformed hands or faces.
+[No AI artifacts, no deformed faces/hands, no plasticky textures]
 ```
 
-A comprehensive NEGATIVO is not paranoia — it is the difference between getting the shot and regenerating 20 times.
+**Step 4: Show and request approval**
 
-## Critical Blocking Rule
+Show the complete prompt. Ask:
+> "¿Aprobás este prompt para Shot [ID] o ajustamos algo?"
 
-Include verbatim in every multi-character prompt:
+If adjustments needed → update and show again. Repeat until approved.
 
-```
-CRITICAL BLOCKING RULE:
-Do not move the characters.
-Do not re-stage the scene.
-Do not re-block the scene.
-Only move the camera.
-```
+**Step 5: Write the prompt**
+
+Write to `production/prompts/[shot-id].md` with the full prompt plus the audit checklist.
+
+**Step 6: Ask about next shot**
+
+> "Prompt de Shot [ID] guardado. ¿Generamos el siguiente plano o ya tenés todos?"
+
+- If more shots → ask which shot ID and repeat from Step 2
+- If all shots done → transition
+
+**Step 7: Transition**
+
+> "Todos los prompts generados. Invocando `stills-audit-loop` para auditar las imágenes generadas..."
+
+Invoke `ai-filmmaking:stills-audit-loop`.
+
+## Output
+
+**File:** `production/prompts/[shot-id].md` (one per shot)
+**Read by:** `stills-audit-loop`, `image-to-video`
 
 ## On Prompt Length
 
-Comprehensive prompts (100-200 lines) are sometimes necessary for multi-character spatial scenes with complex geography and lighting contracts. This is correct and expected — do not shorten them for the sake of brevity.
+Comprehensive prompts (80-150 lines) are correct and expected for multi-character spatial scenes. Do not shorten for brevity.
 
-However: **for single-character or simple shots, 2-3 prioritized cinematic cues often outperform over-specified prompts.**
+For single-character or simple shots: 2-3 prioritized cinematic cues often outperform over-specified prompts.
 
-When a detailed prompt fails repeatedly (3+ batches, same failure): strip to 3 core anchors and rebuild incrementally. Over-specification can confuse the model. The failure pattern tells you which field is causing the conflict.
+When 3+ batches fail with the same prompt structure: strip to 3 core anchors (identity reference, scene continuity reference, camera position) and rebuild one field at a time.
 
 ## Red Flags
 
@@ -141,8 +131,6 @@ When a detailed prompt fails repeatedly (3+ batches, same failure): strip to 3 c
 |---|---|
 | "I'll describe the character instead of using @ref" | Text description drifts. @ref is the only stable identity anchor. |
 | "The NEGATIVO field is optional" | Without negative constraints, the model fills in its own defaults. Those defaults break the scene. |
-| "I'll just describe what I want naturally" | Natural description lacks the structure models need for spatial and identity consistency. |
-| "Longer prompts are always better" | Over-specification can confuse models. When 3+ attempts fail, strip to 3 anchors and rebuild. |
-| "I'll add the style prefix next time" | There is no "next time" without it. Every generation drifts without the prefix. |
-
-**REQUIRED NEXT SKILL:** ai-filmmaking:stills-audit-loop
+| "I'll just describe what I want naturally" | Natural description lacks the structure models need. |
+| "Longer prompts are always better" | When 3+ attempts fail, strip to 3 anchors and rebuild. Over-specification can confuse models. |
+| "I'll add the style prefix later" | Every generation without the prefix produces a different film. There is no later. |

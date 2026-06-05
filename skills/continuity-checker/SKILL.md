@@ -1,13 +1,13 @@
 ---
 name: continuity-checker
-description: Use after completing all stills for a scene, before beginning video generation — verifies that character identity and geography are consistent across every shot
+description: Use after all stills are approved — compares all shots simultaneously against the locked geography and character bibles, writes production/continuity-report.md, then hands off to image-to-video
 ---
 
 # Continuity Checker
 
 ## Overview
 
-Every shot in a scene was generated independently. The model had no memory of the previous shot when it generated the next. Continuity failures are therefore not random accidents — they are the structural default. Without a dedicated verification pass, continuity failures become embedded in video generation and cannot be fixed without reshooting. This skill is the mandatory quality gate between stills and video.
+Every shot was generated independently. The model had no memory of the previous shot. Continuity failures are the structural default — not random accidents. Without a dedicated cross-shot verification pass, failures become embedded in video generation and cannot be fixed without reshooting. This is the mandatory gate between stills and video.
 
 ## The Iron Law
 
@@ -15,73 +15,104 @@ Every shot in a scene was generated independently. The model had no memory of th
 VERIFY CHARACTER IDENTITY AND GEOGRAPHY ACROSS ALL SHOTS BEFORE MOVING TO VIDEO — POST CANNOT FIX CONTINUITY
 ```
 
-## Cross-Shot Checklist
+## Active Process
 
-Place all approved stills side by side (in a grid or comparison view) and run this checklist:
+Announce: "Usando `continuity-checker` para verificar consistencia cross-shot antes del video."
 
-**Screen Positions**
-- [ ] Character A appears on the correct screen side in every shot
-- [ ] Character B appears on the correct screen side in every shot
-- [ ] No shot has reversed character positions relative to the geography document
-- [ ] The 180° axis has not been crossed in any shot
+**Step 1: Read context**
 
-**Object Positions**
-- [ ] Every significant object is in its locked position in every shot
-- [ ] No object has drifted, moved closer to camera, or disappeared
+Read `production/audit-log.md` (to know which shots passed individual audit), `production/scene-geography.md`, `production/character-bible/character-*.md`.
 
-**Lighting Consistency**
-- [ ] Lighting temperature is consistent: same wall = same temperature across all shots
-- [ ] Left surface shows cold reflection in every shot it appears
-- [ ] Right surface shows warm reflection in every shot it appears
-- [ ] Shadow direction and depth are consistent across all shots
+**Step 2: Request all approved images together**
 
-**Material and Environmental Consistency**
-- [ ] Same floor surface, same walls, same furniture in all shots
-- [ ] No element of the set has been redesigned between shots
-- [ ] Environmental details (age, wear, color) are consistent
+> "Compartí todas las imágenes aprobadas juntas — idealmente en un grid o en un solo mensaje. Las voy a comparar entre sí."
 
-**Character Identity**
-- [ ] Compare `@character1` face in all shots simultaneously — identity is consistent
-- [ ] Compare `@character2` face in all shots simultaneously — identity is consistent
-- [ ] Character A wears identical wardrobe in all shots (every item, every detail)
-- [ ] Character B wears identical wardrobe in all shots (every item, every detail)
-- [ ] Character posture and emotional state are consistent within each scene beat
+**Step 3: Run the 12-item cross-shot checklist**
 
-**Style**
-- [ ] Film grain and texture are consistent across all shots
-- [ ] Color palette is consistent — no shot has drifted toward a different grade
-- [ ] No shot has elements from the exclusion list
+For each item, evaluate ALL shots simultaneously:
+
+```
+SCREEN POSITIONS
+☐ Character A appears on the correct screen side in EVERY shot
+☐ Character B appears on the correct screen side in EVERY shot
+☐ No shot has reversed character positions
+☐ The 180° axis has not been crossed in any shot
+
+OBJECT POSITIONS
+☐ Every significant object is in its locked position in every shot
+☐ No object has drifted, moved, or disappeared between shots
+
+LIGHTING CONSISTENCY
+☐ Lighting temperature is consistent: same wall = same temperature in all shots
+☐ Left surface shows cold reflection consistently
+☐ Right surface shows warm reflection consistently
+
+CHARACTER IDENTITY
+☐ @character1 face is consistent across all shots (compare simultaneously)
+☐ @character2 face is consistent across all shots
+☐ Character wardrobe is identical in every shot
+```
+
+**Step 4: If continuity failure found — diagnose and repair**
+
+Tell the user:
+> "Falla de continuidad en Shot [ID]: [item]. La causa probable es [diagnosis]. Pasos:
+> 1. Volvé al prompt de `production/prompts/[shot-id].md`
+> 2. Corregí el campo [field] específico
+> 3. Ejecutá `stills-audit-loop` solo para ese shot
+> 4. Volvé aquí cuando esté aprobado"
+
+**Do not proceed to image-to-video until all continuity failures are resolved.**
+
+**Step 5: Do not proceed if any of these are unresolved**
+
+- Crossed 180° axis in any shot
+- Character on wrong screen side in any shot
+- Character identity drift visible at normal resolution
+- Objects in wrong positions in shots that appear in the same scene
+
+**Step 6: Write the continuity report**
+
+Write to `production/continuity-report.md`:
+
+```markdown
+# Continuity Report
+## [Project name]
+
+> Output of `ai-filmmaking:continuity-checker`
+
+## Result: [APROBADO / REQUIERE CORRECCIÓN]
+
+## Shots verified
+[List of Shot IDs]
+
+## Issues found
+[List of failures with shot ID and field, or "Ninguno"]
+
+## Status per shot
+[Table: Shot ID | Status | Notes]
+```
+
+**Step 7: Transition**
+
+When all items pass:
+> "Continuidad verificada. Todos los shots pasan el check cross-shot. Informe guardado en `production/continuity-report.md`. Invocando `image-to-video`..."
+
+Invoke `ai-filmmaking:image-to-video`.
+
+## Output
+
+**File:** `production/continuity-report.md`
+**Read by:** `image-to-video`
 
 ## Failure Recovery Protocol
 
-When a continuity failure is found, repair in this order:
-
-**Step 1: Identify the failing shot**
-Do not regenerate anything until you know exactly which shot contains the error and exactly what is wrong.
-
-**Step 2: Diagnose root cause**
-- Screen position reversal → 180° axis was crossed or screen position was not explicitly stated in that shot's prompt
-- Object drift → ENTORNO field did not re-state object position for that shot
-- Character identity drift → @ref was not dominant enough for that shot's angle
-- Lighting inconsistency → LUZ field was not restated consistently for that shot
-- Wardrobe inconsistency → Non-Negotiable List was not included in that shot's NEGATIVO
-
-**Step 3: Fix the prompt**
-Go to the cinematographic-prompting skill. Fix the specific field that caused the failure.
-
-**Step 4: Re-run stills-audit-loop for that shot only**
-Do not regenerate the entire scene. Fix only the failing shot.
-
-**Step 5: Re-run the full continuity checklist**
-After any fix, recheck all items. A fix in one shot may reveal a related failure in another.
-
-## Do Not Proceed If
-
-Any of these failures are present — they cannot be fixed in video:
-- Crossed 180° axis in any shot
-- Character on wrong screen side in any shot
-- Character identity drift that is visible at normal resolution
-- Objects in wrong positions that appear in multiple shots
+When a continuity failure is found:
+1. Identify the exact shot containing the error
+2. Diagnose which prompt field caused it
+3. Fix the prompt in `production/prompts/[shot-id].md`
+4. Re-run `stills-audit-loop` for that shot only
+5. Re-run full continuity-checker after fix
 
 ## Red Flags
 
@@ -91,5 +122,3 @@ Any of these failures are present — they cannot be fixed in video:
 | "The lighting difference is subtle" | Subtle differences become obvious when shots are cut together. Fix now. |
 | "I'll check continuity while generating video" | Video generation is the wrong time to discover continuity failures. |
 | "The audience won't notice" | The audience notices everything that breaks the geography — even if they can't name it. |
-
-**REQUIRED NEXT SKILL:** ai-filmmaking:image-to-video

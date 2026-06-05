@@ -1,0 +1,55 @@
+# AI Director — AI Filmmaking Plugin
+
+End-to-end AI filmmaking skills: from dramatic brief to finished cinematic video with sound.
+
+## How to Use
+
+To start any new AI film project, invoke:
+
+```
+ai-filmmaking:using-ai-filmmaking
+```
+
+This skill bootstraps the session, detects existing project state, and guides you through the full pipeline without needing to invoke any other skill manually.
+
+## The 14 Skills
+
+| Skill | Stage | What it does |
+|---|---|---|
+| `using-ai-filmmaking` | Meta | Session bootstrap — detects state, guides to next step |
+| `brief-to-art-direction` | Pre-production | Translates narrative into visual DNA |
+| `moodboard-extraction` | Pre-production | Extracts visual rules from reference images |
+| `style-prefix` | Pre-production | Generates the locked style block for all prompts |
+| `scene-geography` | Pre-production | Locks the 180° axis, screen positions, cameras |
+| `character-bible` | Pre-production | Builds locked character identity references |
+| `shot-list-design` | Pre-production | Designs the shot list before any generation |
+| `asset-pipeline` | Pre-production | Generates location and prop assets separately |
+| `cinematographic-prompting` | Stills | Writes complete 7-field prompts per shot |
+| `stills-audit-loop` | Stills | Audits every generated image before approval |
+| `continuity-checker` | Stills | Verifies cross-shot consistency before video |
+| `image-to-video` | Video | Converts approved stills to video with discipline |
+| `audio-crafting` | Post | Designs the 3-layer audio world |
+| `assembly-compositing` | Post | Assembles and edits the final film |
+
+## Platform
+
+**Claude Code:** Use the `Skill` tool to invoke skills. Skills are invoked with the `ai-filmmaking:` prefix.
+
+## Output Structure
+
+Each skill writes to a `production/` directory in your working folder. The pipeline builds up this structure automatically — you never need to manage it manually.
+
+```
+production/
+  art-direction.md
+  visual-tokens.md
+  style-prefix.md        [LOCKED]
+  scene-geography.md     [LOCKED]
+  character-bible/
+  shot-list.md
+  assets/
+  prompts/
+  audit-log.md
+  continuity-report.md
+  audio-design.md
+```

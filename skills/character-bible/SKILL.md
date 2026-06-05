@@ -1,13 +1,13 @@
 ---
 name: character-bible
-description: Use before generating any character image — creates the identity anchor that ensures the same person appears across all shots at any camera angle
+description: Use before generating any character image — runs a guided Q&A per character and writes production/character-bible/character-[N].md for each
 ---
 
 # Character Bible
 
 ## Overview
 
-One frontal character sheet is not enough. When the camera angle changes, the model drifts. It reinterprets hairstyle, skin tone, age, wardrobe, and posture independently at each angle. By the time you have 5 camera angles, you have 5 slightly different people. Locking character identity requires 8-10 references across angles AND environments, not one studio portrait.
+One frontal character sheet is not enough. When the camera angle changes, the model drifts. By Shot 5, you have 5 slightly different people. Locking character identity requires 15-20 specific descriptors AND 8-10 reference images across angles AND environments. This skill builds that system through a structured Q&A for each character.
 
 ## The Iron Law
 
@@ -15,81 +15,104 @@ One frontal character sheet is not enough. When the camera angle changes, the mo
 NO CHARACTER GENERATION BEFORE THE BIBLE IS WRITTEN AND THE CHARACTER SHEET IS APPROVED AT MULTIPLE ANGLES
 ```
 
-## The Character Bible (Per Character, All Fields Required)
+## Active Process
 
-**Age**
-Specific range, not a vague category.
-- ✅ "30-45, the weight of a decade of quiet professional disappointment"
-- ❌ "middle-aged"
+Announce: "Usando `character-bible` para construir la identidad visual bloqueada de cada personaje."
 
-**Emotional State**
-What they carry that is never stated aloud. This controls posture, micro-expression, eye quality.
-- ✅ "contained exhaustion, restrained vulnerability — she is holding herself together and has been for hours"
-- ❌ "tired and sad"
+**Step 1: Read context**
 
-**Face: 15-20 Specific Descriptors**
-Do not rely on @ref alone for description — the descriptors reinforce identity when the angle shifts.
+Read `production/art-direction.md` and `production/scene-geography.md` to understand the characters and the space they inhabit.
 
-Required descriptor categories:
-- Hair color (specific: "ash blonde", not "blonde")
-- Hair texture and style (specific: "straight, pulled back tightly, not a strand loose")
-- Skin tone (specific: "pale northern European skin, slight blue undertone under eyes")
-- Eye color
-- Eye shape (specific: "slightly hooded, heavy upper lid")
-- Nose shape
-- Jaw and chin shape
-- Cheekbone prominence
-- Mouth (size, set — relaxed or held?)
-- Age markers (where do they show their age?)
-- What is distinctive and unchangeable about this face?
+**Step 2: Ask how many characters**
 
-**Body**
-- Height impression (tall and imposing / compact and contained / average and unremarkable)
-- Posture (rigid / collapsed / held / open / closed)
-- Build (specific: "the body of someone who was once athletic and has become still")
+> "¿Cuántos personajes necesitan biblia? (Solo los que aparecen en 2 o más planos necesitan una.)"
 
-**Wardrobe: Specific Items with Specific Colors**
-Every item named and described.
-- ✅ "dusty pale pink short-sleeved collared dress, matte cotton, slightly fitted, below the knee"
-- ❌ "pink dress"
+**Step 3: For each character — ask in sequence**
 
-Include: upper garment, lower garment or dress, shoes, any accessories. Nothing vague.
+Run through these questions for one character before moving to the next.
 
-**Hands**
-Position at rest. What they reveal.
-- "Hands clasped together on her lap — fingers interlaced, the grip of someone waiting without knowing how long"
+**Pregunta 1 — Nombre de trabajo y rol:**
+> "¿Cómo llamamos a este personaje durante la producción? ¿Qué rol tiene en la escena?"
 
-**The Non-Negotiable List**
-What NEVER changes about this character across any shot:
-- [list every element that is locked]
+**Pregunta 2 — Edad y estado emocional:**
+> "¿Qué rango de edad tiene? ¿Y qué carga emocionalmente que nunca dice en voz alta en la escena?"
+
+**Pregunta 3 — Descripción física (15-20 descriptores):**
+> "Describí la cara con la mayor especificidad posible: color y textura de pelo, tono de piel, color de ojos, forma de mandíbula, pómulos, boca, nariz, qué marcas de edad tiene y dónde, qué es inconfundible de este rostro."
+
+**Pregunta 4 — Cuerpo y postura:**
+> "¿Qué impresión de altura da? ¿Cómo es su postura? ¿Qué revela su cuerpo sobre su interior?"
+
+**Pregunta 5 — Vestuario completo:**
+> "Describí cada prenda con especificidad: nombre, color exacto, material, corte, talla. Nada vago."
+
+**Pregunta 6 — Manos:**
+> "¿Cómo tiene las manos en reposo en esta escena? ¿Qué revelan?"
+
+**Step 4: Generate the bible for this character**
+
+Using all answers, generate the complete character bible and write to `production/character-bible/character-[N].md`:
+
+```markdown
+# Character Bible — [Character name/letter]
+## [Project name]
+
+> Output of `ai-filmmaking:character-bible`
+
+## Working Reference
+@character[N] = [Character name/letter] — LOCKED identity reference
+
+## Core Identity
+- Age range: [specific]
+- Emotional state (never stated aloud): [specific]
+
+## Face — 15-20 Specific Descriptors
+[All descriptors from Q3 — each on its own line]
+
+## Body
+- Height impression: [specific]
+- Posture: [specific]
+- Build: [specific]
+
+## Wardrobe — Complete
+[Each item on its own line: garment / color / material / cut]
+
+## Hands
+[Position at rest + what they reveal]
+
+## The Non-Negotiable List
+What NEVER changes across any shot:
+[Every element that is locked — derive from all of the above]
 
 ## Character Sheet Generation Protocol
+Generate in this order before any scene:
+1. Frontal portrait — white studio background, uniform studio lighting
+2. 3/4 angle — same background, same lighting
+3. Profile — same setup, full side view
+4. In-scene neutral — actual set environment, neutral action
+5. In-scene emotional — same environment, the scene's specific emotion
+6. 3+ additional angles covering the range of camera positions planned
 
-Follow these steps in order:
-
-1. **Frontal portrait** — white studio background, soft uniform studio lighting, character sheet purpose (legibility, not drama). Face fully visible.
-2. **3/4 angle** — same background, same lighting, head turned approximately 45°
-3. **Profile** — same background, same lighting, full side view
-4. **In-scene neutral** — the actual set environment, neutral action (seated, standing, looking forward)
-5. **In-scene emotional** — same environment, the specific emotion of the scene
-6. **Additional angles** — generate until you have 8-10 usable references covering the range of angles the camera will use
-
-Select the best 8-10 images as the locked reference set. Discard the rest.
-
-## Reference Syntax
-
-Lock these before any scene generation:
-
-```
-@character1  =  Character A — locked identity reference
-@character2  =  Character B — locked identity reference
-<<<img1>>>   =  Scene continuity reference (approved key visual / master shot)
+Approve best 8-10 as the locked reference set.
 ```
 
-When generating any image or video:
-- Use `@characterN` — do not describe the character in text if @ref is available
-- `@ref` overrides description. If both conflict, @ref wins.
-- If the model ignores @ref (rare): reduce description tokens and let @ref do more work
+**Step 5: Ask about next character**
+
+> "Biblia de [Character N] guardada. ¿Hay otro personaje o continuamos al siguiente paso?"
+
+If more characters → repeat from Step 3.
+If done → transition.
+
+**Step 6: Transition**
+
+> "Character Bible completa guardada en `production/character-bible/`. Invocando `shot-list-design`..."
+
+Invoke `ai-filmmaking:shot-list-design`.
+
+## Output
+
+**Files:** `production/character-bible/character-[N].md` (one per character)
+**Read by:** `shot-list-design`, `cinematographic-prompting`, `stills-audit-loop`, `continuity-checker`
 
 ## Red Flags
 
@@ -98,7 +121,5 @@ When generating any image or video:
 | "The AI will understand what I mean by 'middle-aged woman'" | It won't. 15-20 specific descriptors minimum. |
 | "One frontal character sheet is enough" | Camera angle changes cause identity drift. 8-10 references required. |
 | "I'll generate the character sheet later" | Generating scenes before character lock means regenerating everything. |
-| "Close enough is fine for a secondary character" | Every character who appears in 2+ shots needs a bible. |
+| "Close enough is fine for a secondary character" | Every character in 2+ shots needs a bible. |
 | "I'll use text description instead of @ref" | Text description drifts. @ref is the only stable identity anchor. |
-
-**REQUIRED NEXT SKILL:** ai-filmmaking:shot-list-design

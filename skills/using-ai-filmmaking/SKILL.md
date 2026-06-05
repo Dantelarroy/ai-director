@@ -1,77 +1,113 @@
 ---
 name: using-ai-filmmaking
-description: Use when starting any AI film project — establishes the mandatory pipeline order and skill invocation discipline before any generation begins
+description: Use when starting any AI film project — bootstraps the session, detects existing project state, and guides to the correct next step without requiring the user to know the pipeline
 ---
 
 # Using AI Filmmaking
 
 ## Overview
 
-AI filmmaking without a pipeline produces visual chaos: character identity drifts between shots, spatial geography contradicts itself, lighting temperature shifts randomly, and hours of generation produce unusable footage. The skills in this plugin enforce the discipline that separates cinema from slop.
+You are the session orchestrator. Every AI filmmaking session starts here. You detect where the project is, tell the user what happens next, and invoke the first relevant skill. The user never needs to know which skill to call — you carry them through.
 
 ## The Iron Law
 
 ```
-CHECK FOR SKILLS BEFORE ANY PRODUCTION STEP — EVEN "JUST ONE QUICK PROMPT"
+CHECK PROJECT STATE BEFORE ANYTHING ELSE — NEVER ASSUME A CLEAN START
 ```
 
-Every step in AI filmmaking has a skill. The skill exists because that step has a failure mode that kills the entire production. Skipping the skill means skipping the protection.
+## Active Process
 
-## The Pipeline (in order)
+When this skill is invoked, run this process in order:
+
+**Step 1: Detect project state**
+
+Check if `production/` exists in the current working directory:
+- If `production/` does not exist → this is a new project. Go to Step 2.
+- If `production/` exists → read which files are present and report status. Go to Step 3.
+
+**Step 2: New project — ask one question**
+
+Say exactly:
+
+> "¿De qué trata tu proyecto? Describime la escena en una oración."
+
+Wait for the answer. Then:
+- Create the `production/` directory
+- Announce: "Empezamos por el principio. Invocando `brief-to-art-direction`..."
+- Invoke `ai-filmmaking:brief-to-art-direction`
+
+**Step 3: Existing project — show state and ask where to continue**
+
+Read which files exist in `production/` and show a status table:
 
 ```
-1.  brief-to-art-direction     ← translate narrative into visual DNA
-2.  moodboard-extraction       ← extract reusable rules from references
-3.  style-prefix               ← lock the style document for all prompts
-4.  scene-geography            ← lock the spatial rules before any image
-5.  character-bible            ← lock character identity at multiple angles
-6.  shot-list-design           ← plan all shots before generating any
-    asset-pipeline             ← generate location and props as separate assets
-7.  cinematographic-prompting  ← write every prompt with 7-field structure
-    stills-audit-loop          ← audit every generated image before approval
-8.  continuity-checker         ← verify cross-shot consistency before video
-9.  image-to-video             ← convert approved stills to video clips
-10. audio-crafting             ← design voice + ambient + music in three layers
-11. assembly-compositing       ← edit to performance rhythm, not visual variety
+Estado del proyecto:
+
+✅  art-direction.md        — Art Direction Document
+✅  visual-tokens.md        — Visual Token Document
+✅  style-prefix.md         — Style Prefix [LOCKED]
+⬜  scene-geography.md      — Scene Geography (pendiente)
+⬜  character-bible/        — Character Bible (pendiente)
+...
 ```
 
-Steps 6 and 7 run in parallel pairs. Every other step is sequential.
+Then ask:
+> "¿Continuamos desde `scene-geography` o necesitás volver a algún paso anterior?"
 
-## How to Invoke Skills
+Based on the answer, invoke the appropriate skill.
 
-In Claude Code, use the `Skill` tool:
-- `ai-filmmaking:brief-to-art-direction`
-- `ai-filmmaking:moodboard-extraction`
-- etc.
+## Platform Adaptation
 
-Invoke the skill BEFORE taking any action in that pipeline stage — not after.
+**Claude Code:** Use the `Skill` tool to invoke skills.
+
+**Codex:** See `references/codex-tools.md` for tool mapping.
+
+**Copilot CLI:** See `references/copilot-tools.md` for tool mapping.
+
+**Gemini CLI:** Tool mapping loaded from `references/gemini-tools.md` via GEMINI.md.
+
+## The Full Pipeline
+
+| Step | Skill | Output file |
+|---|---|---|
+| 1 | `brief-to-art-direction` | `production/art-direction.md` |
+| 2 | `moodboard-extraction` | `production/visual-tokens.md` |
+| 3 | `style-prefix` | `production/style-prefix.md` [LOCKED] |
+| 4 | `scene-geography` | `production/scene-geography.md` [LOCKED] |
+| 5 | `character-bible` | `production/character-bible/character-[N].md` |
+| 6 | `shot-list-design` | `production/shot-list.md` |
+| 7 | `asset-pipeline` | `production/assets/` |
+| 8→loop | `cinematographic-prompting` | `production/prompts/[shot-id].md` |
+| 8→loop | `stills-audit-loop` | appends to `production/audit-log.md` |
+| 9 | `continuity-checker` | `production/continuity-report.md` |
+| 10→loop | `image-to-video` | video prompts per shot |
+| 11 | `audio-crafting` | `production/audio-design.md` |
+| 12 | `assembly-compositing` | final assembly |
+
+## What Each Skill Protects
+
+| Skill | Without it |
+|---|---|
+| `brief-to-art-direction` | Visual drift from the first generation |
+| `moodboard-extraction` | Borrowing specific faces, IP, accidental compositions from references |
+| `style-prefix` | Every shot looks like a different film |
+| `scene-geography` | 180° axis violations, reversed character positions, uneditable material |
+| `character-bible` | Identity drift — 5 shots = 5 different people |
+| `shot-list-design` | Improvised shots that can't be cut together |
+| `asset-pipeline` | Spatial confusion from generating character + location in one prompt |
+| `cinematographic-prompting` | Underspecified prompts that rely on model defaults |
+| `stills-audit-loop` | Approving drifted images that become corrupted references |
+| `continuity-checker` | Cross-shot failures discovered after video generation |
+| `image-to-video` | Spatial incoherence, accidental cuts, mechanical motion |
+| `audio-crafting` | Non-separable generated music embedded in video |
+| `assembly-compositing` | Assembling after generation instead of during |
 
 ## Red Flags
 
 | Thought | Reality |
 |---|---|
-| "I'll just generate one test image first" | Test images set visual expectations that become hard to abandon. Run the pipeline. |
-| "I know what the scene looks like" | You know the narrative. The visual DNA still needs extraction. |
-| "Skills are overhead for a 1-minute short" | A 1-minute short has 5–8 shots. Each shot has 6 continuity variables. The pipeline prevents chaos. |
-| "I'll fix consistency in post" | Post cannot fix wrong character identity or a crossed 180° axis. |
-| "I'll invoke the skill after I try this once" | Once you generate, you've set expectations. Invoke before. |
-
-## What Each Skill Protects
-
-| Skill | What it prevents |
-|---|---|
-| brief-to-art-direction | Visual drift from unanchored narrative decisions |
-| moodboard-extraction | Importing unwanted specifics (faces, IP) from reference images |
-| style-prefix | Style fragmentation across shots or team members |
-| scene-geography | Characters swapping sides, objects moving between shots |
-| character-bible | Character identity drift across camera angles |
-| shot-list-design | Improvised shots that cannot be cut with planned shots |
-| asset-pipeline | Spatial confusion from generating character + location together |
-| cinematographic-prompting | Prompts that produce inconsistent or ambiguous results |
-| stills-audit-loop | Approving images that will break continuity downstream |
-| continuity-checker | Continuity errors that cannot be fixed in post |
-| image-to-video | Camera positioning failures, unwanted cuts, wrong pacing |
-| audio-crafting | Non-separable generated music, reactive sound design |
-| assembly-compositing | Cuts that don't serve rhythm, color grade failures |
-
-**REQUIRED NEXT SKILL:** ai-filmmaking:brief-to-art-direction
+| "I'll just generate one test image first" | Test images set visual expectations. Run the pipeline. |
+| "I know what the scene looks like" | You know the narrative. The visual DNA needs extraction. |
+| "Skills are overhead for a 1-minute short" | 1 minute = 5-8 shots = 6 continuity variables per shot. The pipeline prevents chaos, it doesn't create it. |
+| "I'll fix consistency in post" | Post cannot fix wrong character identity or crossed 180° axis. |
+| "I can skip straight to cinematographic-prompting" | Without locked geography and style prefix, every prompt is guessing. |

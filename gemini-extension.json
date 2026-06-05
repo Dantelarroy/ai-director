@@ -1,0 +1,6 @@
+{
+  "name": "ai-filmmaking",
+  "description": "End-to-end AI filmmaking pipeline: from dramatic brief to cinematic video with sound",
+  "version": "1.0.0",
+  "contextFileName": "GEMINI.md"
+}

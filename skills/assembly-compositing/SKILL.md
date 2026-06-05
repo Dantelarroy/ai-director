@@ -1,96 +1,153 @@
 ---
 name: assembly-compositing
-description: Use when assembling individual shots into a finished film — enforces editorial discipline and the edit-as-you-go workflow that produces coherent short-form cinema
+description: Use when all clips and audio are ready — reads all production documents, generates the complete edit order and VFX list, and closes the pipeline
 ---
 
-# Assembly and Compositing
+# Assembly & Compositing
 
 ## Overview
 
-Generating all shots first, then assembling, is the wrong order. Shots generated without an editorial reference accumulate in the wrong direction — the shot that works for the 60-second version is different from the shot that works for the 90-second version, and you discover this too late. Edit as you go. The timeline is the truth; the pile of generated clips is not.
+Assembly is where every upstream decision is tested simultaneously. The shot list defined the dramatic structure. The geography defined the spatial contract. The continuity checker verified it. Now all three are enforced by the cut. A wrong cut here surfaces a failure from five skills ago. This skill generates the edit order, compositing notes, and closes the production pipeline.
 
 ## The Iron Law
 
 ```
-CUT TO THE RHYTHM OF PERFORMANCE, NOT TO VISUAL VARIETY — EVERY SHOT MUST EARN ITS PLACE IN THE EDIT
+THE EDIT ORDER FOLLOWS THE DRAMATIC LOGIC, NOT THE SHOT LIST ORDER — RESTRUCTURE IF THE STORY DEMANDS IT
 ```
 
-## Edit-As-You-Go Protocol
+## Active Process
 
-**Do not wait until all shots are generated to begin editing.** Add each approved clip to the timeline immediately after it passes the stills audit loop and continuity check.
+Announce: "Usando `assembly-compositing` para generar el montaje final."
 
-Order of operations per shot:
-1. Shot passes stills-audit-loop
-2. Shot passes continuity-checker cross-shot validation
-3. Shot is converted to video via image-to-video
-4. Clip is added to the timeline immediately
-5. The edit is re-evaluated after each addition
+**Step 1: Read all production documents**
 
-**Edit with music from day one.** Do not assemble all clips then add music. The music reveals what duration each shot actually needs — a beat that requires 4 seconds in your head may need 3 in context, or 6. This cannot be discovered from a clip pile.
+Read:
+- `production/art-direction.md` — the dramatic intent
+- `production/shot-list.md` — the planned structure
+- `production/scene-geography.md` — the spatial contract
+- `production/continuity-report.md` — verified shot statuses
+- `production/audio-design.md` — the three-layer audio world
 
-## Editorial Principles
+**Step 2: Ask one question**
 
-**Cut on performance, not on action.** The cut point is the emotional peak of the shot, not the completion of the physical action.
+> "¿Tenés todos los clips aprobados listos para montar? ¿Hay algún plano que haya quedado fuera o que quieras reemplazar antes de cerrar?"
 
-**L-cuts:** The previous shot's audio continues under the new visual. A character hears something and turns — the sound of what she hears leads into the next shot, before she has finished turning.
+**Step 3: Generate the edit order**
 
-**J-cuts:** The next shot's audio begins before the visual cut. The hum of the waiting room begins while we are still in the corridor.
+The edit order follows dramatic logic, not shot list order. Propose the cut sequence:
 
-**Hold on stillness.** The most emotionally loaded moments are often the most visually static. Resist the urge to cut away from a still face. The audience reads everything that happens in that stillness.
+```
+EDIT ORDER:
+[N]. Shot [ID] — [TYPE] — [Duration] — [Transition] — [Dramatic function]
+[N]. Shot [ID] — [TYPE] — [Duration] — [Transition] — [Dramatic function]
+...
+```
 
-**The discipline of duration:** A shot lasts as long as the performance requires. 4 seconds is not better or worse than 8 seconds — the performance tells you which.
+For each transition:
+- **Hard cut** — tension or contrast
+- **Dissolve** — time passage or emotional softening
+- **L-cut** — previous shot audio continues under new visual (incoming sound leads)
+- **J-cut** — next shot audio begins before visual cut
+- **Match cut** — spatial continuity across scenes
 
-## The Discarding Rule
+**Step 4: Generate the compositing notes**
 
-A technically perfect shot that does not serve the rhythm of the edit is discarded.
+```
+COMPOSITING NOTES:
+1. Composite elements: [props generated separately → composite in Photoshop before timeline import]
+2. Color grade: [correction only — base look already baked via style prefix]
+3. Grain: [unified post layer across full film — not per-shot]
+4. Export: 24fps / [aspect ratio from style prefix] / highest quality before delivery compression
 
-"I generated 64 takes to get this" is not a reason to use it. If the shot breaks the rhythm, slows the momentum, or adds visual information the edit does not need — discard it.
+AUDIO COMPOSITE ORDER:
+1. Ambient first (room tone, signature sounds)
+2. Voice second (dialogue, narration)
+3. Music third (score, sync points)
+[Sync points from production/audio-design.md]
+```
 
-The edit is a curation, not a showcase of what was generated.
+**Step 5: Surface any unresolved issues**
 
-**What gets discarded:**
-- Shots that break the pacing of adjacent shots
-- Shots with continuity failures that were not caught before video generation
-- Shots that are technically correct but emotionally redundant with adjacent shots
-- Alternative takes that are good but not better than what's already in the cut
+Check `production/continuity-report.md` for any unresolved failures:
 
-**Never apologize for discarding generated material.** The goal is the finished film.
+> "Antes de cerrar el pipeline, el continuity report registra: [issue / 'ningún problema']. ¿Lo resolvés o lo dejamos para iteración futura?"
 
-## VFX and Compositing Order
+**Step 6: Show plan for approval**
 
-Apply in this sequence to avoid compounding corrections:
+Show full edit order and compositing notes. Ask:
+> "¿Aprobás este plan de montaje o ajustamos algo?"
 
-**1. Composite separately-generated elements**
-Props generated independently (photo walls, Polaroid collections, handmade objects) must be composited into the scene in Photoshop or equivalent before being imported as final clips. Never composite in the timeline — the temporal interface is not designed for spatial compositing.
+**Step 7: Write the assembly document**
 
-**2. Color grade**
-90% of the color grade should already be baked in through reference work and the style prefix. The post grade is correction, not creation. If shots look wildly different from each other at this stage, the reference work was insufficient — post cannot fix this.
+Write to `production/assembly.md`:
 
-Film grain: add as a unified post layer across the entire film (not per-shot), so grain is consistent regardless of minor style differences between shots.
+```markdown
+# Assembly Plan
+## [Project name]
 
-**3. Audio mix**
-Layer in order: ambient first, then voice, then music. This order ensures each layer is audible when the next is added. Reversing the order buries ambient under music and voice under music.
+> Output of `ai-filmmaking:assembly-compositing`
 
-**4. Final export**
-- Target format: 24fps (already locked in style prefix)
-- Aspect ratio: as defined in style prefix
-- Export at highest quality from the timeline before compressing for delivery
+## Edit Order
+[Full sequence table]
+
+## Compositing Notes
+[Grade / grain / export / element compositing]
+
+## Audio Composite
+[Layer order and sync points from audio-design.md]
+
+## Pipeline Status
+[COMPLETO / Pendiente: list]
+
+## Iteration notes
+[If any shot needs to be regenerated: which skill to return to]
+```
+
+**Step 8: Close the pipeline**
+
+> "Pipeline completo. Todos los documentos de producción están en `production/`. El plan de montaje está en `production/assembly.md`."
+
+Show the production file tree:
+
+```
+production/
+  art-direction.md          ✅
+  visual-tokens.md          ✅
+  style-prefix.md           ✅ [LOCKED]
+  scene-geography.md        ✅ [LOCKED]
+  character-bible/          ✅
+  shot-list.md              ✅
+  assets/                   ✅
+  prompts/                  ✅
+  audit-log.md              ✅
+  continuity-report.md      ✅
+  audio-design.md           ✅
+  assembly.md               ✅
+```
+
+If iteration is needed: return to the governing skill — `scene-geography` for spatial failures, `character-bible` for identity drift, `stills-audit-loop` for image failures, `audio-crafting` for audio issues.
+
+## Output
+
+**File:** `production/assembly.md`
+**This is the final skill in the pipeline.**
+
+## Cut Principles
+
+| Principle | Application |
+|---|---|
+| Cut on performance | Cut at the emotional peak of the shot, not completion of action |
+| L-cut | Previous audio continues under new visual — incoming sound leads |
+| J-cut | Next audio begins before visual cut — space breathes before cut |
+| Hold on stillness | The most loaded moments are often visually static — resist cutting away |
+| Discard earned shots | A technically perfect shot that breaks rhythm is discarded. Generation count is not a reason to keep it. |
 
 ## Red Flags
 
 | Thought | Reality |
 |---|---|
-| "I'll generate all shots first, then assemble" | Shots generated without editorial reference accumulate in the wrong direction. Edit as you go. |
-| "I'll use every shot I generated" | The edit is a curation. Every shot that earns its place is in. Every shot that doesn't is discarded. |
-| "I'll add music at the end after the edit is locked" | Music shapes the edit. Add it from the first clip. |
-| "This shot has a continuity error but it's the best take" | Continuity errors break immersion permanently. Regenerate. There is no "best take" with a visible error. |
-| "I'll fix the color grade in post" | Post color grading on footage with wildly different base looks produces visual incoherence. Fix the reference. |
-| "The composited elements can be done in the timeline" | Timeline compositing lacks the precision needed for spatial element integration. Use a dedicated compositing tool. |
-
-**Pipeline complete.** If you need to iterate on the film, return to the skill that governs the failing element:
-- Wrong geography in video → ai-filmmaking:scene-geography
-- Character identity drift → ai-filmmaking:character-bible
-- Stills failing audit → ai-filmmaking:stills-audit-loop
-- Continuity failures → ai-filmmaking:continuity-checker
-- Video generation failures → ai-filmmaking:image-to-video
-- Audio not working → ai-filmmaking:audio-crafting
+| "I'll generate all shots first, then assemble" | Shots without editorial reference accumulate in the wrong direction. |
+| "I'll use every shot I generated" | The edit is a curation. Shots that don't earn their place are discarded. |
+| "I'll add music after the edit is locked" | Music shapes the edit. Add from the first clip. |
+| "This shot has a continuity error but it's the best take" | Continuity errors break immersion permanently. Regenerate. |
+| "I'll fix the color grade in post" | Wildly different base looks cannot be corrected by grading. Fix the reference. |
